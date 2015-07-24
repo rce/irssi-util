@@ -1,0 +1,13 @@
+#!/bin/sh
+
+repo=$(pwd)
+
+if [ ! -f $(pwd)/util.pl ]; then
+	echo "Run command in the repository root."
+	exit 1
+fi
+
+mkdir -p ~/.irssi/scripts/autorun
+cd ~/.irssi/scripts && ln -s $repo/util.pl .
+cd ~/.irssi/scripts/autorun && ln -s ../util.pl .
+

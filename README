@@ -1,0 +1,4 @@
+# Install dependencies (on Ubuntu)
+
+sudo apt-get install libwww-perl libjson-perl
+
