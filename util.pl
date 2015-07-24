@@ -30,7 +30,31 @@ sub youtube_get_info {
 	my $json = decode_json($response->content());
 	my $item = $json->{items}[0];
 	my $title = $item->{snippet}->{title};
-	return "YouTube: $title";
+	my $duration = parse_duration($item->{contentDetails}->{duration});
+	return "YouTube: $title [$duration]";
+}
+
+sub parse_duration {
+	my ($pt) = @_;
+	$pt =~ /P((\d+)Y)?((\d+)M)?((\d+)W)?((\d+)D)?T((\d+)H)?((\d+)M)?((\d+)S)?/;
+	my ($years, $months, $weeks, $days, $hours, $minutes, $seconds)
+		= ($2, $4, $6, $8, $10, $12, $14);
+	# Ignore years and months because of their variable durations
+	my $hh = 0 + $hours + ($days * 24) + ($weeks * 7 * 24);
+	my $mm = 0 + $minutes;
+	my $ss = 0 + $seconds;
+	if ($hh != 0) {
+		return $hh.':'.pad($mm).':'.pad($ss);
+	}
+	return pad($mm).':'.pad($ss);
+}
+
+sub pad {
+	my ($val) = @_;
+	if ($val < 10) {
+		return "0$val";
+	}
+	return $val;
 }
 
 sub handle_message {
