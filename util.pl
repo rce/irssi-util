@@ -61,8 +61,8 @@ sub handle_message {
 	my ($server, $msg, $nick, $chan) = @_;
 
 	$_ = $msg;
-	if (/https:\/\/www.youtube.com\/watch\?v=([a-z0-9_-]{11})/i) {
-		$server->print($chan, youtube_get_info($1));
+	if (/(https?:\/\/)?(youtu.be\/|(www\.)?youtube.com\/(watch\?\S*v=|embed\/|v\/))([a-z0-9_-]{11})/i) {
+		$server->print($chan, youtube_get_info($5));
 		return;
 	}
 }
