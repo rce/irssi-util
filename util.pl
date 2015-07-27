@@ -102,10 +102,22 @@ sub on_own_message {
 	handle_message($server, $msg, $server->{nick}, $chan);
 }
 
+sub on_private_message {
+	my ($server, $msg, $nick) = @_;
+	handle_message($server, $msg, $nick, $nick);
+}
+
+sub on_own_private_message {
+	my ($server, $msg, $target) = @_;
+	handle_message($server, $msg, $server->{nick}, $target);
+}
+
 # Settings
 Irssi::settings_add_str($IRSSI{name}, 'util_youtube_apikey', '');
 
 # Signals
 Irssi::signal_add('message public' => \&on_message);
+Irssi::signal_add('message private' => \&on_private_message);
 Irssi::signal_add('message own_public' => \&on_own_message);
+Irssi::signal_add('message own_private' => \&on_own_private_message);
 
