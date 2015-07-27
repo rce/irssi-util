@@ -12,16 +12,35 @@ use vars qw(%IRSSI);
 
 use LWP::UserAgent;
 use JSON;
+use HTML::Parser;
+use HTML::Entities;
+
+sub get {
+	my ($url) = @_;
+	my $ua = LWP::UserAgent->new(timeout=>30);
+	$ua->agent('rce/irssi-util');
+	$ua->max_size(64 * 1024);
+	return $ua->request(HTTP::Request->new('GET', $url));
+}
+
+sub get_title {
+	my ($url) = @_;
+	my $response = get($url);
+	unless ($response->is_success()) {
+		return "Error fetching title for '$url'";
+	}
+
+	if ($response->content() =~ /<title>(.*)<\/title>/) {
+		return decode_entities($1);
+	}
+	return "";
+}
 
 sub youtube_get_info {
 	my ($id) = @_;
 	my $apikey = Irssi::settings_get_str('util_youtube_apikey');
-	my $ua = LWP::UserAgent->new(timeout=>30);
-	$ua->agent('rce/irssi-util');
-
 	my $url = 'https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id='.$id.'&key='.$apikey;
-	my $request = HTTP::Request->new('GET', $url);
-	my $response = $ua->request($request);
+	my $response = get($url);
 	unless ($response->is_success()) {
 		print CLIENTCRAP "Request failed";
 		print CLIENTCRAP 'Response: '.$response->content();
@@ -63,6 +82,12 @@ sub handle_message {
 	$_ = $msg;
 	if (/(https?:\/\/)?(youtu.be\/|(www\.)?youtube.com\/(watch\?\S*v=|embed\/|v\/))([a-z0-9_-]{11})/i) {
 		$server->print($chan, youtube_get_info($5));
+		return;
+	} elsif (/((https?:\/\/)?(\w+\.)?(\w+)(\.[a-z]{2,})(\/\S*)?)/i) {
+		my $title = get_title($1);
+		if ($title ne "") {
+			$server->print($chan, $title);
+		}
 		return;
 	}
 }
