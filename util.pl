@@ -25,6 +25,10 @@ sub get {
 
 sub get_title {
 	my ($url) = @_;
+
+	# Prefix with http:// if needed
+	if ($url !~ /^https?:\/\//) { $url = "http://$url"; }
+
 	my $response = get($url);
 	unless ($response->is_success()) {
 		return "Error fetching title for '$url'";
@@ -88,7 +92,7 @@ sub handle_message {
 	if (/(https?:\/\/)?(youtu.be\/|(www\.)?youtube.com\/(watch\?\S*v=|embed\/|v\/))([a-z0-9_-]{11})/i) {
 		$server->print($chan, youtube_get_info($5));
 		return;
-	} elsif (/((https?:\/\/)?(\w+\.)?(\w+)(\.[a-z]{2,})(\/\S*)?)/i) {
+	} elsif (/((https?:\/\/|www\.)([\w-]+\.)*([\w-]+)(\.[a-z]{2,})(\/\S*)?)/i) {
 		my $title = get_title($1);
 		if ($title ne "") {
 			$server->print($chan, $title);
