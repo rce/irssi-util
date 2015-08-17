@@ -1,4 +1,12 @@
-# Install dependencies (on Ubuntu)
+# Installation
 
-sudo apt-get install libwww-perl libjson-perl
+Install dependencies (on Ubuntu).
+
+    sudo apt-get install libwww-perl libjson-perl
+
+Install the script itself.
+
+    git clone https://github.com/rce/irssi-util.git ~/irssi-util
+    cd ~/irssi-util
+    ./install
 
