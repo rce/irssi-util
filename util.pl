@@ -30,6 +30,11 @@ sub get_title {
 		return "Error fetching title for '$url'";
 	}
 
+	if (index($response->header("Content-Type"), "html") == -1) {
+		# Non-HTML response
+		return "";
+	}
+
 	if ($response->content() =~ /<title>(.*)<\/title>/) {
 		return decode_entities($1);
 	}
